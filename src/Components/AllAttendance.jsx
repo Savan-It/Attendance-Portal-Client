@@ -4,19 +4,20 @@ import axios from 'axios';
 function AllAttendance() {
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
     const [attendanceData, setAttendanceData] = useState([]);
+   
+    
 
     useEffect(() => {
-        fetchAttendanceData();
+        const fetchAttendanceData = async () => {
+            try {
+                const response = await axios.get(`https://attendanceserver.onrender.com/all-employees-attendace/${selectedMonth}`);
+                setAttendanceData(response.data);
+            } catch (error) {
+                console.error('Error fetching attendance:', error.message);
+            }
+        };
+    fetchAttendanceData()
     }, [selectedMonth]);
-
-    const fetchAttendanceData = async () => {
-        try {
-            const response = await axios.get(`https://attendanceserver.onrender.com/all-employees-attendace/${selectedMonth}`);
-            setAttendanceData(response.data);
-        } catch (error) {
-            console.error('Error fetching attendance:', error.message);
-        }
-    };
 
     const handleMonthChange = (e) => {
         setSelectedMonth(e.target.value);
