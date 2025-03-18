@@ -9,7 +9,7 @@ function Login({ setIsLogin }) {
     e.preventDefault();
     // Static username and password check
     if (username === 'rajubhai' && password === 'rajubhai@123') {
-      setIsLogin(true); // Update login state to true
+      setIsLogin(true);
     } else {
       setError('Invalid username or password');
     }

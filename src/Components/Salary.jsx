@@ -1,23 +1,12 @@
 // Salary.js (React Component)
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 function Salary() {
   const [selectedMonth, setSelectedMonth] = useState(getInitialMonth());
   const [salaryReport, setSalaryReport] = useState([]); // [[employee, salary
-
-  useEffect(() => {
-    setSelectedMonth(getInitialMonth());
-  }, []);
-
-  function getInitialMonth() {
-    const currentDate = new Date();
-    const yearMonth = currentDate.toISOString().split('-').slice(0, 2).join('-');
-    return yearMonth;
-  }
-
-  const generateSalary = async () => {
-
+  
+  const generateSalary = useCallback(async () => {
     try {
       const response = await axios.post('https://attendanceserver.onrender.com/generateSalary', {
         month: selectedMonth
@@ -26,14 +15,27 @@ function Salary() {
     } catch (error) {
       console.error('Error generating salary:', error.message);
     }
-  };
+  }, [selectedMonth]);
+
+ 
+  useEffect(() => {
+    setSelectedMonth(getInitialMonth());
+    generateSalary();
+  }, [generateSalary]);
+
+  function getInitialMonth() {
+    const currentDate = new Date();
+    const yearMonth = currentDate.toISOString().split('-').slice(0, 2).join('-');
+    return yearMonth;
+  }
+
 
   const handleMonthChange = (e) => {
     setSelectedMonth(e.target.value);
   };
 
   return (
-    <div className='container py-5'>
+    <div className='container py-5 salary_table'>
       <div className="row text-center">
         <div className="col">
           <div className="row">
@@ -53,7 +55,7 @@ function Salary() {
             </div>
           </div>
           <div className="row mt-5">
-            <div className="col-10">
+            <div className="col">
               <table className="table table-bordered">
                 <thead>
                   <tr>
