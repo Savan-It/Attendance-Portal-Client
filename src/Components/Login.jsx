@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import GlobalAlert from './GlobalAlert';
 
 function Login({ setIsLogin }) {
   const [username, setUsername] = useState('');
@@ -7,7 +8,6 @@ function Login({ setIsLogin }) {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Static username and password check
     if (username === 'rajubhai' && password === 'rajubhai@123') {
       setIsLogin(true);
     } else {
@@ -19,8 +19,13 @@ function Login({ setIsLogin }) {
     <div className="container d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
       <div className="card p-4 shadow-sm" style={{ width: '400px' }}>
         <h2 className="text-center mb-4">Login</h2>
-        {error && <div className="alert alert-danger">{error}</div>}
-        <form onSubmit={handleLogin}>
+        {error && (
+          <GlobalAlert
+            type="success"
+            message={error}
+            onClose={() => setError('')}
+          />
+        )}        <form onSubmit={handleLogin}>
           <div className="mb-3">
             <label htmlFor="username" className="form-label">Username</label>
             <input

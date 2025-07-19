@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Home.scss';
+import GlobalAlert from './GlobalAlert';
 import { ErrorMessage, Formik, Form, Field } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
@@ -70,16 +71,16 @@ function Home() {
   return (
     <>
       <div className="container px-5">
-        {
-          alert &&
-          <div className="row my-4">
-            <div className="col text-center">
-            <div class="alert alert-success" role="alert">
-              {alertMessage}
-            </div>
-          </div>
-          </div>
-        }
+        {alert && (
+          <GlobalAlert
+            type="success"
+            message={alertMessage}
+            onClose={() => { 
+              setAlert(false); 
+              setAlertMessage(''); 
+            }}
+          />
+        )}
       <div className="row my-4">
         <div className="col text-center">
           <h4>Attendance</h4>

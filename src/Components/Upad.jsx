@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import GlobalAlert from './/GlobalAlert';
 
 function Upad() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -78,16 +79,13 @@ function Upad() {
     <div className="container px-5">
       <div className="row">
         <div className="col">
-          {
-            alert.status &&
-            <div className="row my-4">
-              <div className="col text-center">
-                <div class="alert alert-success" role="alert">
-                  {alert.message}
-                </div>
-              </div>
-            </div>
-          } 
+          {alert.status && (
+          <GlobalAlert
+            type="success"
+            message={alert.message}
+            onClose={() => setAlert({ status: false, message: '' })}
+          />
+        )}
           <div className="row my-4">
             <div className="col text-center">
               <h4>Upad</h4>

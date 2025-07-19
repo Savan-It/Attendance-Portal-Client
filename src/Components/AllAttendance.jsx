@@ -5,8 +5,6 @@ function AllAttendance() {
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
     const [attendanceData, setAttendanceData] = useState([]);
    
-    
-
     useEffect(() => {
         const fetchAttendanceData = async () => {
             try {

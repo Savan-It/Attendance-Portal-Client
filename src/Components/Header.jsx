@@ -21,7 +21,10 @@ function Header({ setIsLogin }) {
           <div className="collapse navbar-collapse" id="navbarNavDropdown">
             <ul className="navbar-nav me-auto">
               <li className="nav-item">
-                <Link className="nav-link" to="/">Attendance</Link>
+                <Link className="nav-link" to="/salary">Attendance</Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/salary">Salary</Link>
               </li>
               <li className="nav-item">
                 <Link className="nav-link" to="/upad">Upad</Link>
