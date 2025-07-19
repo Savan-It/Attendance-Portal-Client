@@ -19,7 +19,7 @@ function Upad() {
 
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get('https://attendanceserver.onrender.com/employees');
+      const response = await axios.get('http://localhost:8000/employees');
       setEmployees(response.data);
     } catch (error) {
       console.error('Error fetching employees:', error.message);
@@ -47,7 +47,7 @@ function Upad() {
         amount: formData.amount,
       };
       // Send 'data' to the backend using Axios POST request
-      await axios.post('https://attendanceserver.onrender.com/upad', data)
+      await axios.post('http://localhost:8000/upad', data)
         .then((response) => {
           setAlert({
             status: true,

@@ -16,7 +16,7 @@ function Home() {
 
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get('https://attendanceserver.onrender.com/employees');
+      const response = await axios.get('http://localhost:8000/employees');
       setEmployees(response.data);
     } catch (error) {
       console.error('Error fetching employees:', error.message);
@@ -29,17 +29,24 @@ function Home() {
     }, {})
   );
 
+  const mapRadioToStatus = (val) => {
+    if (val === 'Yes') return 'Present';
+    if (val === 'No') return 'Absent';
+    if (val === 'Half') return 'Half';
+    return 'Absent'; // default fallback
+  };
+  
   const handleSubmit = async (values, { resetForm }) => {
     try {
       const attendanceData = employees.map((employee) => ({
         employee: employee._id,
-        status: values[`status-${employee._id}`] === 'Yes' ? 'Present' : 'Absent',
+        status: mapRadioToStatus(values[`status-${employee._id}`]),
       }));
 
       console.log('Attendance data:', attendanceData);
 
       const response = await axios.post(
-        `https://attendanceserver.onrender.com/attendance/${selectedDate.toISOString().slice(0, 10)}`,
+        `http://localhost:8000/attendance/${selectedDate.toISOString().slice(0, 10)}`,
         attendanceData
       );
       setAlertMessage(response.data.message);
@@ -106,22 +113,14 @@ function Home() {
                   <div className="col">
                     <p>{employee.name}</p>
                   </div>
-                  <div className="col text-end">
-                    <label htmlFor={`${employee._id}Yes`}>Yes</label>
-                    <Field
-                      type="radio"
-                      name={`status-${employee._id}`}
-                      value="Yes"
-                      className="me-2"
-                      id={`${employee._id}Yes`}
-                    />
-                    <label htmlFor={`${employee._id}No`}>No</label>
-                    <Field
-                      type="radio"
-                      name={`status-${employee._id}`}
-                      value="No"
-                      id={`${employee._id}No`}
-                    />
+                  <div className="col text-end d-flex justify-content-end align-items-center">
+                    <label htmlFor={`${employee._id}Half`} className="me-2">H</label>
+                    <Field type="radio" name={`status-${employee._id}`} value="Half" id={`${employee._id}Half`} />
+                    <div className='mx-2'>||</div>
+                    <label htmlFor={`${employee._id}Yes`} className="me-2">Yes</label>
+                    <Field type="radio" name={`status-${employee._id}`} value="Yes" className="me-2" id={`${employee._id}Yes`} />
+                    <label htmlFor={`${employee._id}No`} className="me-2">No</label>
+                    <Field type="radio" name={`status-${employee._id}`} value="No" id={`${employee._id}No`} />
                   </div>
                 </div>
                 <ErrorMessage

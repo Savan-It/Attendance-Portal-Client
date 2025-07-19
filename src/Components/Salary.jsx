@@ -8,7 +8,7 @@ function Salary() {
   
   const generateSalary = useCallback(async () => {
     try {
-      const response = await axios.post('https://attendanceserver.onrender.com/generateSalary', {
+      const response = await axios.post('http://localhost:8000/generateSalary', {
         month: selectedMonth
       });
       setSalaryReport(response.data.salaryReport);
