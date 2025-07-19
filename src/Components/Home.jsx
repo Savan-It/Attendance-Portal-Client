@@ -16,7 +16,7 @@ function Home() {
 
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/employees');
+      const response = await axios.get('https://attendanceserver.onrender.com/employees');
       setEmployees(response.data);
     } catch (error) {
       console.error('Error fetching employees:', error.message);
@@ -46,7 +46,7 @@ function Home() {
       console.log('Attendance data:', attendanceData);
 
       const response = await axios.post(
-        `http://localhost:8000/attendance/${selectedDate.toISOString().slice(0, 10)}`,
+        `https://attendanceserver.onrender.com/attendance/${selectedDate.toISOString().slice(0, 10)}`,
         attendanceData
       );
       setAlertMessage(response.data.message);

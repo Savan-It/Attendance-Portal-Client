@@ -10,7 +10,7 @@ function AllAttendance() {
     useEffect(() => {
         const fetchAttendanceData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/all-employees-attendace/${selectedMonth}`);
+                const response = await axios.get(`https://attendanceserver.onrender.com/all-employees-attendace/${selectedMonth}`);
                 setAttendanceData(response.data);
             } catch (error) {
                 console.error('Error fetching attendance:', error.message);

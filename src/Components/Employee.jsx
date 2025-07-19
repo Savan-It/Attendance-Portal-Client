@@ -10,7 +10,7 @@ function Employee() {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/employees');
+      const res = await axios.get('https://attendanceserver.onrender.com/employees');
       setEmployees(res.data);
     } catch (err) {
       console.error('Error fetching employees:', err.message);
@@ -33,7 +33,7 @@ function Employee() {
 
   const handleEditSubmit = async (id) => {
     try {
-      await axios.put(`http://localhost:8000/employees/${id}`, editForm);
+      await axios.put(`https://attendanceserver.onrender.com/employees/${id}`, editForm);
       setEditingId(null);
       fetchEmployees();
     } catch (error) {
@@ -44,7 +44,7 @@ function Employee() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
       try {
-        await axios.delete(`http://localhost:8000/employees/${id}`);
+        await axios.delete(`https://attendanceserver.onrender.com/employees/${id}`);
         fetchEmployees(); // refresh list
       } catch (error) {
         console.error('Error deleting employee:', error.message);
@@ -60,7 +60,7 @@ function Employee() {
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/employees', newEmployee);
+      await axios.post('https://attendanceserver.onrender.com/employees', newEmployee);
       setNewEmployee({ name: '', employeeType: '' });
       setShowAddForm(false);
       fetchEmployees();
