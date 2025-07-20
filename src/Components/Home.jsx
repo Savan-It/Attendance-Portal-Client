@@ -97,50 +97,58 @@ function Home() {
           </div>
         </div>
       </div>
-      <Formik
-        initialValues={employees.reduce((acc, employee) => {
-          acc[`status-${employee._id}`] = '';
-          return acc;
-        }, {})}
-        validationSchema={validationSchema}
+      {employees.length === 0 ? (
+        <div className="row my-5">
+          <div className="col text-center">
+            <h5>No employees found.</h5>
+          </div>
+        </div>
+      ) : (
+        <Formik
+          initialValues={employees.reduce((acc, employee) => {
+            acc[`status-${employee._id}`] = '';
+            return acc;
+          }, {})}
+          validationSchema={validationSchema}
 
-        onSubmit={handleSubmit}
-      >
-        {({ errors, touched }) => (
-          <Form>
-            {employees.map((employee) => (
-              <div key={employee._id}>
-                <div className="row employeeBox mt-4">
-                  <div className="col">
-                    <p>{employee.name}</p>
+          onSubmit={handleSubmit}
+        >
+          {({ errors, touched }) => (
+            <Form>
+              {employees.map((employee) => (
+                <div key={employee._id}>
+                  <div className="row employeeBox mt-4">
+                    <div className="col">
+                      <p>{employee.name}</p>
+                    </div>
+                    <div className="col text-end d-flex justify-content-end align-items-center">
+                      <label htmlFor={`${employee._id}Half`} className="me-2">H</label>
+                      <Field type="radio" name={`status-${employee._id}`} value="Half" id={`${employee._id}Half`} />
+                      <div className='mx-2'>||</div>
+                      <label htmlFor={`${employee._id}Yes`} className="me-2">Yes</label>
+                      <Field type="radio" name={`status-${employee._id}`} value="Yes" className="me-2" id={`${employee._id}Yes`} />
+                      <label htmlFor={`${employee._id}No`} className="me-2">No</label>
+                      <Field type="radio" name={`status-${employee._id}`} value="No" id={`${employee._id}No`} />
+                    </div>
                   </div>
-                  <div className="col text-end d-flex justify-content-end align-items-center">
-                    <label htmlFor={`${employee._id}Half`} className="me-2">H</label>
-                    <Field type="radio" name={`status-${employee._id}`} value="Half" id={`${employee._id}Half`} />
-                    <div className='mx-2'>||</div>
-                    <label htmlFor={`${employee._id}Yes`} className="me-2">Yes</label>
-                    <Field type="radio" name={`status-${employee._id}`} value="Yes" className="me-2" id={`${employee._id}Yes`} />
-                    <label htmlFor={`${employee._id}No`} className="me-2">No</label>
-                    <Field type="radio" name={`status-${employee._id}`} value="No" id={`${employee._id}No`} />
-                  </div>
+                  <ErrorMessage
+                    name={`status-${employee._id}`}
+                    component="div"
+                    className="text-danger"
+                  />
                 </div>
-                <ErrorMessage
-                  name={`status-${employee._id}`}
-                  component="div"
-                  className="text-danger"
-                />
+              ))}
+              <div className="row my-4">
+                <div className="col text-center">
+                  <button type="submit" className="btn btn-primary">
+                    Submit
+                  </button>
+                </div>
               </div>
-            ))}
-            <div className="row my-4">
-              <div className="col text-center">
-                <button type="submit" className="btn btn-primary">
-                  Submit
-                </button>
-              </div>
-            </div>
-          </Form>
-        )}
-      </Formik>
+            </Form>
+          )}
+        </Formik>
+      )}
     </div >
     </>
   );

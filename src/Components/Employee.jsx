@@ -4,9 +4,13 @@ import axios from 'axios';
 function Employee() {
   const [employees, setEmployees] = useState([]);
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ name: '', employeeType: '' });
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newEmployee, setNewEmployee] = useState({ name: '', employeeType: '' });
+  const [newEmployee, setNewEmployee] = useState({ name: '', employeeType: '', dailySalary: '' });
+  const [editForm, setEditForm] = useState({ name: '', employeeType: '', dailySalary: '' });
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   const fetchEmployees = async () => {
     try {
@@ -17,13 +21,13 @@ function Employee() {
     }
   };
 
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-
   const handleEditClick = (employee) => {
     setEditingId(employee._id);
-    setEditForm({ name: employee.name, employeeType: employee.employeeType });
+    setEditForm({
+      name: employee.name,
+      employeeType: employee.employeeType,
+      dailySalary: employee.dailySalary,
+    });
   };
 
   const handleEditChange = (e) => {
@@ -45,7 +49,7 @@ function Employee() {
     if (window.confirm('Are you sure you want to delete this employee?')) {
       try {
         await axios.delete(`https://attendanceserver.onrender.com/employees/${id}`);
-        fetchEmployees(); // refresh list
+        fetchEmployees();
       } catch (error) {
         console.error('Error deleting employee:', error.message);
       }
@@ -61,7 +65,7 @@ function Employee() {
     e.preventDefault();
     try {
       await axios.post('https://attendanceserver.onrender.com/employees', newEmployee);
-      setNewEmployee({ name: '', employeeType: '' });
+      setNewEmployee({ name: '', employeeType: '', dailySalary: '' });
       setShowAddForm(false);
       fetchEmployees();
     } catch (error) {
@@ -70,116 +74,120 @@ function Employee() {
   };
 
   return (
-    <div className="container">
-      <div className="d-flex justify-content-between align-items-center my-4">
-        <h3>Employees</h3>
-        <button className="btn btn-success" onClick={() => setShowAddForm(!showAddForm)}>
-          {showAddForm ? 'Cancel' : '+ Add Employee'}
+    <div className="container py-3">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4>Employees</h4>
+        <button className="btn btn-success btn-sm" onClick={() => setShowAddForm(!showAddForm)}>
+          {showAddForm ? 'Cancel' : '+ Add'}
         </button>
       </div>
 
       {showAddForm && (
-        <form onSubmit={handleAddSubmit} className="mb-4">
-          <div className="row g-2">
-            <div className="col-md-4">
-              <input
-                type="text"
-                name="name"
-                value={newEmployee.name}
-                onChange={handleAddChange}
-                className="form-control"
-                placeholder="Name"
-                required
-              />
-            </div>
-            <div className="col-md-4">
-              <select
-                className="form-select"
-                name="employeeType"
-                value={newEmployee.employeeType}
-                onChange={handleAddChange}
-                required
-              >
-                <option value="">Select Type</option>
-                <option value="laborer">Laborer</option>
-                <option value="carftsman">Carftsman</option>
-              </select>
-            </div>
-            <div className="col-md-4">
-              <button type="submit" className="btn btn-primary w-100">
-                Save
-              </button>
-            </div>
+        <form onSubmit={handleAddSubmit} className="bg-light p-3 rounded mb-3">
+          <div className="mb-2">
+            <input
+              type="text"
+              name="name"
+              value={newEmployee.name}
+              onChange={handleAddChange}
+              className="form-control"
+              placeholder="Name"
+              required
+            />
           </div>
+          <div className="mb-2">
+            <select
+              className="form-select"
+              name="employeeType"
+              value={newEmployee.employeeType}
+              onChange={handleAddChange}
+              required
+            >
+              <option value="">Select Type</option>
+              <option value="laborer">Laborer</option>
+              <option value="carftsman">Craftsman</option>
+            </select>
+          </div>
+          <div className="mb-2">
+            <input
+              type="number"
+              name="dailySalary"
+              value={newEmployee.dailySalary}
+              onChange={handleAddChange}
+              className="form-control"
+              placeholder="Daily Salary"
+              min="0"
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary w-100">
+            Save Employee
+          </button>
         </form>
       )}
 
-      <table className="table table-bordered">
-        <thead className="table-light">
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th width="120">Action</th>
-          </tr>
-        </thead>
-        <tbody>
+      {/* Employee List as Cards */}
+      {employees.length > 0 ? (
+        <div className="employee-list">
           {employees.map((emp) => (
-            <tr key={emp._id}>
-              <td>
-                {editingId === emp._id ? (
+            <div className="card mb-2 p-2" key={emp._id}>
+              {editingId === emp._id ? (
+                <>
                   <input
                     type="text"
                     name="name"
                     value={editForm.name}
                     onChange={handleEditChange}
-                    className="form-control"
+                    className="form-control mb-2"
+                    placeholder="Name"
                   />
-                ) : (
-                  emp.name
-                )}
-              </td>
-              <td>
-                {editingId === emp._id ? (
                   <select
                     name="employeeType"
                     value={editForm.employeeType}
                     onChange={handleEditChange}
-                    className="form-select"
+                    className="form-select mb-2"
                   >
                     <option value="laborer">Laborer</option>
-                    <option value="carftsman">Carftsman</option>
+                    <option value="carftsman">Craftsman</option>
                   </select>
-                ) : (
-                  emp.employeeType
-                )}
-              </td>
-              <td>
-                {editingId === emp._id ? (
-                  <button className="btn btn-sm btn-success" onClick={() => handleEditSubmit(emp._id)}>
+                  <input
+                    type="number"
+                    name="dailySalary"
+                    value={editForm.dailySalary}
+                    onChange={handleEditChange}
+                    className="form-control mb-2"
+                    placeholder="Daily Salary"
+                  />
+                  <button className="btn btn-success btn-sm w-100" onClick={() => handleEditSubmit(emp._id)}>
                     Save
                   </button>
-                ) : (
-                  <>
-                     <button className="btn btn-sm btn-warning me-1" onClick={() => handleEditClick(emp)} title="Edit">
-                        <i className="bi bi-pencil-square"></i>
-                      </button>
-                      <button className="btn btn-sm btn-danger" onClick={() => handleDelete(emp._id)} title="Delete">
-                        <i className="bi bi-trash"></i>
-                      </button>
-                  </>
-                )}
-              </td>
-            </tr>
+                </>
+              ) : (
+                <>
+                  <h6 className="mb-1">{emp.name} ({emp.employeeType})</h6>
+                  <p className="mb-2"><strong>₹</strong> {emp.dailySalary}/day</p>
+                  <div className="d-flex gap-2">
+                    <button
+                      className="btn btn-warning btn-sm flex-fill"
+                      onClick={() => handleEditClick(emp)}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm flex-fill"
+                      onClick={() => handleDelete(emp._id)}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           ))}
-          {employees.length === 0 && (
-            <tr>
-              <td colSpan="3" className="text-center text-muted">
-                No employees found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+        </div>
+      ) : (
+        <div className="text-center text-muted">No employees found.</div>
+      )}
     </div>
   );
 }
