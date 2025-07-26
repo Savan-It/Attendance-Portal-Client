@@ -1,4 +1,3 @@
-// components/GlobalAlert.js
 import React, { useEffect, useRef } from 'react';
 
 function GlobalAlert({ type = 'success', message, onClose }) {

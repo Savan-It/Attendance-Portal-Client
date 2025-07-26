@@ -7,12 +7,14 @@ import * as Yup from 'yup';
 
 function Home() {
   const [employees, setEmployees] = useState([]);
+  const [sites, setSites] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [alertMessage, setAlertMessage] = useState('');
   const [alert, setAlert] = useState(false);
 
   useEffect(() => {
     fetchEmployees();
+    fetchSites();
   }, []);
 
   const fetchEmployees = async () => {
@@ -23,9 +25,20 @@ function Home() {
       console.error('Error fetching employees:', error.message);
     }
   };
+
+  const fetchSites = async () => {
+    try {
+      const res = await axios.get('https://attendanceserver.onrender.com/site');
+      setSites(res.data);
+    } catch (error) {
+      console.error('Error fetching sites:', error.message);
+    }
+  };
+
   const validationSchema = Yup.object().shape(
     employees.reduce((acc, employee) => {
-      acc[`status-${employee._id}`] = Yup.string().required(`Please select attendance for ${employee.name}`);
+      acc[`status-${employee._id}`] = Yup.string().required(`Select attendance for ${employee.name}`);
+      acc[`site-${employee._id}`] = Yup.string();
       return acc;
     }, {})
   );
@@ -34,122 +47,117 @@ function Home() {
     if (val === 'Yes') return 'Present';
     if (val === 'No') return 'Absent';
     if (val === 'Half') return 'Half';
-    return 'Absent'; // default fallback
+    return 'Absent';
   };
-  
-  const handleSubmit = async (values, { resetForm }) => {
-    try {
-      const attendanceData = employees.map((employee) => ({
+
+const handleSubmit = async (values, { resetForm }) => {
+  try {
+    const attendanceData = employees.map((employee) => {
+      const status = mapRadioToStatus(values[`status-${employee._id}`]);
+      const site = status !== 'Absent' ? values[`site-${employee._id}`] : null;
+
+      return {
         employee: employee._id,
-        status: mapRadioToStatus(values[`status-${employee._id}`]),
-      }));
+        status,
+        ...(site && { site }), // only include site if it's not null
+      };
+    });
 
-      console.log('Attendance data:', attendanceData);
+    const response = await axios.post(
+      `https://attendanceserver.onrender.com/attendance/${selectedDate.toISOString().slice(0, 10)}`,
+      attendanceData
+    );
 
-      const response = await axios.post(
-        `https://attendanceserver.onrender.com/attendance/${selectedDate.toISOString().slice(0, 10)}`,
-        attendanceData
-      );
-      setAlertMessage(response.data.message);
-      setAlert(true);
-      resetForm();
-      setTimeout(() => {
-        setAlert(false);
-      }, 2500);
-
-      console.log('Attendance details updated for all employees.');
-    } catch (error) {
-      console.error('Error submitting attendance:', error.message);
-    }
-  };
+    setAlertMessage(response.data.message);
+    setAlert(true);
+    resetForm();
+    setTimeout(() => setAlert(false), 2500);
+  } catch (error) {
+    console.error('Error submitting attendance:', error.message);
+  }
+};
 
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
+  const handleDateChange = (date) => setSelectedDate(date);
 
   return (
     <>
-      <div className="container px-5">
+      <div className="container px-3">
         {alert && (
           <GlobalAlert
             type="success"
             message={alertMessage}
-            onClose={() => { 
-              setAlert(false); 
-              setAlertMessage(''); 
+            onClose={() => {
+              setAlert(false);
+              setAlertMessage('');
             }}
           />
         )}
-      <div className="row my-4">
-        <div className="col text-center">
-          <h4>Attendance</h4>
+
+        <div className="row my-3">
+          <div className="col text-center">
+            <h4>Attendance Entry</h4>
+          </div>
         </div>
-      </div>
-      <div className="row">
-        <div className="col">
-          <div className="date-selector">
+
+        <div className="row mb-3">
+          <div className="col text-center">
             <input
               type="date"
               value={selectedDate.toISOString().slice(0, 10)}
               onChange={(e) => handleDateChange(new Date(e.target.value))}
+              className="form-control w-100"
             />
           </div>
         </div>
-      </div>
-      {employees.length === 0 ? (
-        <div className="row my-5">
-          <div className="col text-center">
-            <h5>No employees found.</h5>
-          </div>
-        </div>
-      ) : (
-        <Formik
-          initialValues={employees.reduce((acc, employee) => {
-            acc[`status-${employee._id}`] = '';
-            return acc;
-          }, {})}
-          validationSchema={validationSchema}
 
-          onSubmit={handleSubmit}
-        >
-          {({ errors, touched }) => (
-            <Form>
-              {employees.map((employee) => (
-                <div key={employee._id}>
-                  <div className="row employeeBox mt-4">
-                    <div className="col">
-                      <p>{employee.name}</p>
+        {employees.length === 0 ? (
+          <div className="text-center my-4">No employees found.</div>
+        ) : (
+          <Formik
+            initialValues={employees.reduce((acc, employee) => {
+              acc[`status-${employee._id}`] = '';
+              acc[`site-${employee._id}`] = '';
+              return acc;
+            }, {})}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ errors, touched }) => (
+              <Form>
+                {employees.map((employee) => (
+                  <div className="card p-3 mb-3 shadow-sm" key={employee._id}>
+                    <strong>{employee.name}</strong>
+                    <div className="d-flex justify-content-start gap-3 my-2 flex-wrap">
+                      <label>
+                        <Field type="radio" name={`status-${employee._id}`} value="Yes" /> Present
+                      </label>
+                      <label>
+                        <Field type="radio" name={`status-${employee._id}`} value="No" /> Absent
+                      </label>
+                      <label>
+                        <Field type="radio" name={`status-${employee._id}`} value="Half" /> Half
+                      </label>
                     </div>
-                    <div className="col text-end d-flex justify-content-end align-items-center">
-                      <label htmlFor={`${employee._id}Half`} className="me-2">H</label>
-                      <Field type="radio" name={`status-${employee._id}`} value="Half" id={`${employee._id}Half`} />
-                      <div className='mx-2'>||</div>
-                      <label htmlFor={`${employee._id}Yes`} className="me-2">Yes</label>
-                      <Field type="radio" name={`status-${employee._id}`} value="Yes" className="me-2" id={`${employee._id}Yes`} />
-                      <label htmlFor={`${employee._id}No`} className="me-2">No</label>
-                      <Field type="radio" name={`status-${employee._id}`} value="No" id={`${employee._id}No`} />
-                    </div>
+                    <Field as="select" name={`site-${employee._id}`} className="form-select mb-2">
+                      <option value="">Select Site</option>
+                      {sites.map((site) => (
+                        <option key={site._id} value={site._id}>{site.name}</option>
+                      ))}
+                    </Field>
+                    <ErrorMessage name={`status-${employee._id}`} component="div" className="text-danger" />
+                    <ErrorMessage name={`site-${employee._id}`} component="div" className="text-danger" />
                   </div>
-                  <ErrorMessage
-                    name={`status-${employee._id}`}
-                    component="div"
-                    className="text-danger"
-                  />
+                ))}
+
+                <div className="text-center my-4">
+                  <button type="submit" className="btn btn-primary w-100">Submit Attendance</button>
                 </div>
-              ))}
-              <div className="row my-4">
-                <div className="col text-center">
-                  <button type="submit" className="btn btn-primary">
-                    Submit
-                  </button>
-                </div>
-              </div>
-            </Form>
-          )}
-        </Formik>
-      )}
-    </div >
+              </Form>
+            )}
+          </Formik>
+        )}
+      </div>
     </>
   );
 }

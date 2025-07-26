@@ -75,11 +75,17 @@ function Employee() {
 
   return (
     <div className="container py-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>Employees</h4>
+      <div className="row my-4">
+        <div className="col text-center">
+          <h2 className='m-0'>Employees</h2>
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col text-end">
         <button className="btn btn-success btn-sm" onClick={() => setShowAddForm(!showAddForm)}>
           {showAddForm ? 'Cancel' : '+ Add'}
         </button>
+        </div>
       </div>
 
       {showAddForm && (

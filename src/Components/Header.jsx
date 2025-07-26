@@ -33,6 +33,9 @@ function Header({ setIsLogin }) {
                 <Link className="nav-link" to="/employee">Employee</Link>
               </li>
               <li className="nav-item">
+                <Link className="nav-link" to="/site">Sites</Link>
+              </li>
+              <li className="nav-item">
                 <Link className="nav-link" to="/attendance-details">Details</Link>
               </li>
             </ul>
