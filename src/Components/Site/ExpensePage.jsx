@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { currencyFormat } from '../../utils/currency';
@@ -8,11 +8,6 @@ function ExpensePage() {
     const [site, setSite] = useState(null);
     const [form, setForm] = useState({ date: '', type: '', amount: '' });
     const navigate = useNavigate();
-
-    const fetchSite = async () => {
-        const res = await axios.get(`https://attendanceserver.onrender.com/site/${id}`);
-        setSite(res.data);
-    };
 
     const handleExpenseSubmit = async (e) => {
         e.preventDefault();
@@ -26,7 +21,14 @@ function ExpensePage() {
         fetchSite();
     };
 
-    useEffect(() => { fetchSite(); }, [id]);
+    const fetchSite = useCallback(async () => {
+        const res = await axios.get(`https://attendanceserver.onrender.com/site/${id}`);
+        setSite(res.data);
+    }, [id]);
+
+    useEffect(() => {
+        fetchSite();
+    }, [fetchSite]);
 
     if (!site) return <div className="container py-4">Loading...</div>;
 
